@@ -1,0 +1,15 @@
+const GET_DOGS = 'GET_DOGS';
+const GET_DOGS_BY_NAME = 'GET_DOGS_BY_NAME';
+const GET_DETAIL = 'GET_DETAIL';
+const ORDER_BY_NAME = 'ORDER_BY_NAME';
+const GET_LOADING = 'GET_LOADING';
+const CLEAR_STATE = 'CLEAR_STATE';
+
+module.exports = {
+    GET_DOGS,
+    GET_DOGS_BY_NAME,
+    ORDER_BY_NAME,
+    GET_DETAIL,
+    CLEAR_STATE,
+    GET_LOADING
+}
