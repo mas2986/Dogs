@@ -14,24 +14,37 @@ module.exports = (sequelize) => {
       type: DataTypes.STRING,
       allowNull: false,
     },
-    weight:{
+    weightMin:{
       type:DataTypes.INTEGER,
-      allowNull:false
+      allowNull:false,
+      min:0
     },  
+    weightMax:{
+      type:DataTypes.INTEGER,
+      allowNull:false,
+      min:0
+    },
     image:{
       type:DataTypes.STRING,
       allowNull:false,
       defaultValue: 'https://img.freepik.com/vector-gratis/lindo-perro-muerde-ilustracion-icono-vector-dibujos-animados-hueso-concepto-icono-naturaleza-animal-aislado-vector-premium-estilo-dibujos-animados-plana_138676-3743.jpg?w=800'
     },      
-    height:{
-      type:DataTypes.INTEGER,
+    heightMin:{
+      type:DataTypes.INTEGER,  
+      min:0     
     },
-    lifeSpan:{
+    heightMax:{
+      type:DataTypes.INTEGER,  
+      min:0     
+    },    
+    lifeSpanMin:{
+      type:DataTypes.INTEGER, 
+      min:0       
+    },
+    lifeSpanMax:{
       type:DataTypes.INTEGER,
-      get() {
-        const rawValue = this.getDataValue('lifeSpan');
-        return !rawValue ? 'Años de vida no especificados' : rawValue;
-      }    },
+      min:0        
+    },
     createdDB:{
       type:DataTypes.BOOLEAN,
       allowNull: false,

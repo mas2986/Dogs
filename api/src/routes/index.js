@@ -20,11 +20,12 @@ const getDogsApi = async ()=>{
                 image: dog.image.url,
                 name: dog.name,
                 temperaments:dog.temperament?.split(', '),
-                weight: dog.weight.metric?.split('-'),
-                height: dog.height.metric?.split('-'),
-                lifeSpan: dog.life_span?.split('-')
+                weight: dog.weight.metric?.split(' - ').map(p=>parseInt(p)),
+                height: dog.height.metric?.split(' - ').map(p=>parseInt(p)),
+                lifeSpan: dog.life_span?.split(' - ').map(p=>parseInt(p))
             }
-        })        
+        })     
+        console.log(dogsApi[0])   
         return dogsApi;
     }
     catch(e){return []};
@@ -32,8 +33,9 @@ const getDogsApi = async ()=>{
 
 const getDogsDB = async()=>{
     try{
-        let dogsDB = await Dog.findAll({
-            include:{
+        let dogsDB = await Dog.findAll(
+        {
+            include:{                
                 model:Temperament,
                 attributes:['name'],
                 through: {
@@ -44,6 +46,12 @@ const getDogsDB = async()=>{
         dogsDB = dogsDB.map(dogDB=>dogDB.toJSON());  
         dogsDB.map(el=>{
             el.temperaments = el.temperaments.map(type=>type.name);
+            el.weight = [el.weightMin,el.weightMax];
+            el.height = [el.heightMin,el.heightMax];
+            el.lifeSpan = [el.lifeSpanMin,el.lifeSpanMax];
+            delete el.weightMin;delete el.weightMax
+            delete el.heightMin;delete el.heightMax
+            delete el.lifeSpanMin;delete el.lifeSpanMax
             });
         return dogsDB;
     }
@@ -105,13 +113,22 @@ router.get('/temperament',async(req,res,next)=>{
 })
 
 router.post('/dog',async(req,res,next)=>{
-    let {name,weight,height,temperament} = req.body;
-    if(!name || !weight || !height || !temperament) return res.status(404).send('Faltan datos obligatorios');
+    let {name,weightMin,weightMax,height,temperament} = req.body;
+    console.log('body',req.body);
+    console.log(req.body.name);
+    if(!name || !weightMin || !weightMax || !temperament) {
+        console.log('name',name);
+        console.log('weightMin',weightMin);
+        console.log('weightMax',weightMax);
+        console.log('temperaments',temperament)
+        return res.status(404).send('Faltan datos obligatorios');
+    }
     try{
         let dog = await Dog.create(req.body);
         let promises = temperament.map(el=>Temperament.findOne({where:{name:el},attributes:['id']}))
         let temperamentId = await Promise.all(promises);
         await dog.addTemperament(temperamentId);
+        console.log(dog);
         return res.status(201).json(dog);
     }
     catch(e){next(e)};

@@ -1,3 +1,5 @@
+
+  
 .container{
     width: 50%;
     height: 300px;
@@ -9,3 +11,12 @@
 .campo{
     margin: 10px 0px;
 }
+
+.danger {
+    border: red 1px solid;
+  }
+
+.dangerText{
+    color: red;
+    font-size: 12px
+} 

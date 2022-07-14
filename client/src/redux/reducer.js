@@ -1,9 +1,10 @@
-import {GET_DOGS, GET_DOGS_BY_NAME, ORDER_BY_NAME,GET_DETAIL,CLEAR_STATE, GET_LOADING} from './constRedux';
+import {GET_DOGS,GET_TEMPERAMENTS, GET_DOGS_BY_NAME, GET_DETAIL, ADD_DOG ,ORDER_BY_NAME,ORDER_BY_WEIGHT, FILTER_BY_TEMPERAMENTS, CLEAR_STATE} from './constRedux';
 
 const initialState = {
     dogs:[],
     dogsName:[],
     dogDetail:{},
+    temperaments:[],
     loading: true
 }
 
@@ -12,18 +13,32 @@ const rootReducer = (state = initialState, action)=>{
         case GET_DOGS:
             return{
                 ...state,
-                dogs:[...action.payload]
+                dogs:[...action.payload],
+                allDogs: [...action.payload],
+                loading:false
+            }
+        case GET_TEMPERAMENTS:
+            return{
+                ...state,
+                temperaments:[...action.payload]
             }
         case GET_DOGS_BY_NAME:
             return{
                 ...state,
-                dogsName:[...action.payload]
+                dogsName:[...action.payload],
+                loading:false
             }
         case GET_DETAIL:
             return{
                 ...state,
-                dogDetail:action.payload
+                dogDetail:action.payload,
+                loading:false
             }
+        case ADD_DOG:
+            return{
+                ...state
+            }
+        
         case ORDER_BY_NAME:
             let dogsName = state.dogs;
             dogsName = dogsName.sort((a,b)=>{
@@ -35,16 +50,33 @@ const rootReducer = (state = initialState, action)=>{
             return{
                 ...state,
                 dogs:dogsName
-            }
-        case GET_LOADING:
+            } 
+        case ORDER_BY_WEIGHT:
+            let dogsWeight = state.dogs;
+            dogsWeight = dogsWeight.sort(function(a,b){
+                if(a.weight[0]>b.weight[0]) return 1;
+                if(a.weight[0]<b.weight[0]) return -1;
+                return 0;
+            });
+            if(action.payload!=='MinMax') dogsWeight = dogsWeight.reverse();
             return{
                 ...state,
-                loading: action.payload
+                dogs:dogsWeight
             }
-        case CLEAR_STATE:
+        case FILTER_BY_TEMPERAMENTS:
+            let dogsTemperaments = state.allDogs;
+            if(action.payload!=='todos') dogsTemperaments = dogsTemperaments.filter(el=>el.temperaments?.includes(action.payload));
             return{
                 ...state,
-                dogDetail:action.payload
+                dogs:dogsTemperaments
+            }
+            case CLEAR_STATE:
+            return{
+                ...state,
+                dogDetail:{},
+                dogsName:[],
+                dogs:[],
+                loading:true
             }
         default:
             return {...state}

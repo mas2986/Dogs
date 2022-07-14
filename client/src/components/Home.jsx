@@ -6,7 +6,7 @@ import Order from './Order';
 import Filter from './Filter';
 import Paginado from './Paginado';
 import Loader from './Loader';
-import { getDogs,getDogsByName,isLoading } from '../redux/action';
+import { getDogs,getTemperaments, getDogsByName,clearState } from '../redux/action';
 import s from '../style/Home.module.css'
 
 export default function Home() {
@@ -14,11 +14,12 @@ export default function Home() {
     const dogs = useSelector(state => state.dogs);  
     const dogsName = useSelector(state=>state.dogsName);
     const loading = useSelector(state=>state.loading);
+    const temperaments = useSelector(state=>state.temperaments);
 
     let location = useLocation();
     
 
-    const [dogsPerPage, setDogsPerPage] = useState(9);
+    const [dogsPerPage, setDogsPerPage] = useState(8);
     const [currentPage,setCurrentPage] = useState(1);
     const indexLastDog = currentPage*dogsPerPage;
     const indexFirstDog = indexLastDog - dogsPerPage;
@@ -26,16 +27,14 @@ export default function Home() {
 
     const [order,setOrder] = useState('');
     useEffect(() => {
+        dispatch(getTemperaments());
         if(location.pathname === '/search') {
             dispatch(getDogsByName(location.search.split('=')[1]));
         }
         else{
             dispatch(getDogs())
-        }
-        dispatch(isLoading(false));
-        setTimeout(()=>{
-            dispatch(isLoading(true))
-        },500)
+        }     
+        return ()=>{dispatch(clearState())}
     }, [dispatch,location.search.split('=')[1]])
     //Otra solución para evitar los re renderizados podría ser generar un estado global en reducer
     //cuyos valores TRUE o FALSE se modifiquen desde el componente NavBar y
@@ -45,7 +44,7 @@ export default function Home() {
         setCurrentPage(number);
     }
 
-    if(!loading) return(<Loader className={s.container}/>)
+    if(loading) return(<Loader className={s.container}/>)
     if(location.pathname === '/search'){
         return(            
             <div className={s.container}>
@@ -57,6 +56,7 @@ export default function Home() {
                         id={dog.id}
                         name={dog.name}
                         weight={dog.weight}
+                        temperaments={dog.temperaments}
                         />))}
             </div>)
     } 
@@ -65,13 +65,14 @@ export default function Home() {
         <div>
             <div className={s.container}>
                 <Order setOrder={setOrder} setCurrentPage={setCurrentPage}/>
-                <Filter setCurrentPage={setCurrentPage}/>
+                <Filter setCurrentPage={setCurrentPage} temperaments={temperaments}/>
                 {currentDogs && currentDogs.map(dog => (
                     <DogCard key={dog.id}
                         id={dog.id}
                         image={dog.image}
                         name={dog.name}
                         weight={dog.weight}
+                        temperaments={dog.temperaments}
                     />
 
                 ))}
